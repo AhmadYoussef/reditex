@@ -1,14 +1,14 @@
 import { MikroORM, Options } from "@mikro-orm/core";
-import { Post } from "./entities/Post";
 import { __PROD__ } from "./constants";
 import path from "path";
+import entities from "./entities";
 
 const config: Options = {
   migrations: {
     path: path.join(__dirname, "./migrations"),
     pattern: /^[\w-]+\d+\.ts$/,
   },
-  entities: [Post],
+  entities: entities,
   dbName: "lireddit",
   type: "postgresql",
   user: "ahmyou",
