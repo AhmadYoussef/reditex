@@ -6,7 +6,6 @@ import { buildSchema } from "type-graphql";
 import getResolvers from "./resolvers";
 import session from "express-session";
 import { __PROD__ } from "./constants";
-import { MyContext } from "./types";
 import connectRedis from "connect-redis";
 import { createClient } from "redis";
 import cors from "cors";
