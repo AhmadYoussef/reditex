@@ -5,7 +5,7 @@ import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import getResolvers from "./resolvers";
 import session from "express-session";
-import { __PROD__ } from "./constants";
+import { COOKIE_NAME, __PROD__ } from "./constants";
 import connectRedis from "connect-redis";
 import { createClient } from "redis";
 import cors from "cors";
@@ -29,7 +29,7 @@ const main = async () => {
 
   app.use(
     session({
-      name: "qid",
+      name: COOKIE_NAME,
       store: new RedisStore({
         client: redisClient,
         disableTouch: true,
