@@ -1,57 +1,31 @@
 import { MikroORM } from "@mikro-orm/core";
-import microConfig from "./mikro-orm.config";
+import microConfig from "./configs/mikro-orm.config";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import getResolvers from "./resolvers";
-import session from "express-session";
-import { COOKIE_NAME, __PROD__ } from "./constants";
-import connectRedis from "connect-redis";
-import { createClient } from "redis";
-import cors from "cors";
+import { __PROD__ } from "./constants";
+import { sessionConfig } from "./configs/session.config";
+import { corsConfig } from "./configs/cors.config";
+import Redis from "ioredis";
 
 const main = async () => {
   const orm = await MikroORM.init(microConfig);
+  orm.getMigrator().up();
   const app = express();
 
-  let RedisStore = connectRedis(session);
+  let redis = new Redis();
 
-  // i need  to find the right type :()
-  let redisClient: any = createClient({ legacyMode: true });
-  await redisClient.connect().catch(console.error);
+  app.use(corsConfig());
 
-  app.use(
-    cors({
-      origin: "http://localhost:3000",
-      credentials: true,
-    })
-  );
-
-  app.use(
-    session({
-      name: COOKIE_NAME,
-      store: new RedisStore({
-        client: redisClient,
-        disableTouch: true,
-      }),
-      cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-        httpOnly: true,
-        sameSite: "lax", // csrf
-        secure: __PROD__, // cookie only works in https
-      },
-      saveUninitialized: false,
-      secret: "qowiueojwojfalksdjoqiwueo",
-      resave: false,
-    })
-  );
+  app.use(await sessionConfig(redis));
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: getResolvers(),
       validate: false,
     }),
-    context: ({ req, res }) => ({ em: orm.em.fork(), req, res }),
+    context: ({ req, res }) => ({ em: orm.em.fork(), req, res, redis }),
   });
 
   apolloServer.applyMiddleware({

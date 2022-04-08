@@ -1,4 +1,4 @@
-import { Post } from "./Post";
-import { User } from "./User";
+import { Post } from "./Post/Post";
+import { User } from "./User/User";
 
 export default [Post, User];

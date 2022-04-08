@@ -1,7 +1,7 @@
 import { NonEmptyArray } from "type-graphql";
-import { HelloResolver } from "./hello";
-import { PostResolver } from "./post";
-import { UserResolver } from "./user";
+import { HelloResolver } from "./hello/hello";
+import { PostResolver } from "./post/post";
+import { UserResolver } from "./user/user";
 
 export default (): NonEmptyArray<Function> => [
   HelloResolver,

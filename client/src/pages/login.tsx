@@ -1,4 +1,4 @@
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
@@ -8,8 +8,7 @@ import { Wrapper } from "../components/Wrapper";
 import { useLoginMutation } from "../generated/graphql";
 import { createUrqlClient } from "../util/createUrqlClient";
 import { toErrorMap } from "../util/toErrorMap";
-
-interface registerProps {}
+import NextLink from "next/link";
 
 const Login: React.FC<{}> = ({}) => {
   const router = useRouter();
@@ -17,10 +16,10 @@ const Login: React.FC<{}> = ({}) => {
   return (
     <Wrapper>
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
           console.log(values);
-          const response = await login({ options: values });
+          const response = await login(values);
 
           if (response.data?.login.errors) {
             setErrors(toErrorMap(response.data.login.errors));
@@ -32,10 +31,10 @@ const Login: React.FC<{}> = ({}) => {
         {({ isSubmitting }) => (
           <Form>
             <InputField
-              id={"username"}
-              label={"Username:"}
-              name={"username"}
-              placeholder={"username"}
+              id={"usernameOrEmail"}
+              label={"Username or Email:"}
+              name={"usernameOrEmail"}
+              placeholder={"usernameOrEmail"}
             />
             <Box mt={4}>
               <InputField
@@ -43,8 +42,16 @@ const Login: React.FC<{}> = ({}) => {
                 label={"Password:"}
                 name={"password"}
                 placeholder={"password"}
+                autoComplete="username"
                 type="password"
               />
+            </Box>
+            <Box textAlign={"right"}>
+              <NextLink href="/forgetPassword">
+                <Link ml="auto" color="blue">
+                  Forget Password
+                </Link>
+              </NextLink>
             </Box>
             <Button
               mt={4}
